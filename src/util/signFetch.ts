@@ -7,44 +7,8 @@ const triggerPrivateKey = env("TRIGGER_ADDRESS_PRIVATE_KEY");
 
 const wallet = new ethers.Wallet(triggerPrivateKey as string);
 
-function orderedJsonStringify(obj: any): string {
-  if (obj === undefined) {
-    return "null";
-  }
-
-  if (obj === null || typeof obj !== "object") {
-    return JSON.stringify(obj);
-  }
-
-  if (Array.isArray(obj)) {
-    return "[" + obj.map(orderedJsonStringify).join(",") + "]";
-  }
-
-  if (obj instanceof Date) {
-    return JSON.stringify(obj);
-  }
-
-  if (obj instanceof RegExp) {
-    return JSON.stringify(obj.toString());
-  }
-
-  const keys = Object.keys(obj).sort();
-  const pairs = keys.map((key) => {
-    const value = obj[key];
-    if (typeof value === "function") {
-      return `"${key}":null`;
-    }
-    return `"${key}":${orderedJsonStringify(value)}`;
-  });
-  return "{" + pairs.join(",") + "}";
-}
-
 async function signData(data: Object): Promise<string> {
-
-  
-  const message = orderedJsonStringify(data);
-
-  console.log("Signing message", message);
+  const message = JSON.stringify(data);
   return wallet.signMessage(message);
 }
 
@@ -58,13 +22,12 @@ export default async function fetcher<T>(
       (new URL(input as string).search || "");
     
     const toSign = {
-      body: orderedJsonStringify(JSON.parse(body as string)),
+      body,
       method: init?.method || "POST",
       url: pathname_and_query,
       date: new Date().toISOString(),
       nonce: ethers.hexlify(ethers.randomBytes(32)),
     };
-
     
     const signature = await signData(toSign);
     
