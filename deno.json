@@ -4,6 +4,6 @@
     "test": "deno test --allow-read --allow-write --allow-net --allow-env"
   },
   "name": "@dain/daintrader-trigger-sdk-base",
-  "version": "0.0.10-beta",
+  "version": "0.0.1-beta",
   "exports": "./src/index.ts"
 }
