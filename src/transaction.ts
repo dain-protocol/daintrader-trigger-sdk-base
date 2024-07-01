@@ -67,8 +67,8 @@ async function createSwapTx(
       fromToken,
       toToken,
       amount,
-      slippageBps,
       triggerAddress,
+      slippageBps,
     }),
   });
 
@@ -84,20 +84,24 @@ async function getApproval(
   slippageBps: number
 ): Promise<{ approve: any }> {
   const url = `${env("API_URL")}/autonomy-sdk-api/base/tx/getApproval`;
-  const { success, approve } = await fetcher<{
+  const { success, approve, error } = await fetcher<{
     success: boolean;
     approve: any;
+    error: string;
   }>(url, {
     body: JSON.stringify({
       fromToken,
       toToken,
       amount,
-      slippageBps,
       triggerAddress,
+      slippageBps,
+
     }),
   });
 
-  if (!success) throw new Error("Failed to fetch getApproval tx");
+  if (!success) {
+    throw new Error("Failed to fetch getApproval tx | " + error +  " | " + JSON.stringify({ fromToken, toToken, amount, slippageBps, triggerAddress }));
+  }
 
   return { approve };
 }
