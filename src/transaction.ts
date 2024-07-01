@@ -58,10 +58,11 @@ async function createSwapTx(
   slippageBps: number
 ): Promise<{ approve: any; request: any }> {
   const url = `${env("API_URL")}/autonomy-sdk-api/base/tx/swap`;
-  const { success, request, approve } = await fetcher<{
+  const { success, request, approve, error } = await fetcher<{
     success: boolean;
     request: any;
     approve: any;
+    error?: string;
   }>(url, {
     body: JSON.stringify({
       fromToken,
@@ -72,7 +73,9 @@ async function createSwapTx(
     }),
   });
 
-  if (!success) throw new Error("Failed to fetch tx swap");
+  if (!success) {
+    throw new Error("Failed to fetch swap tx | " + error + " | " + JSON.stringify({ fromToken, toToken, amount, slippageBps, triggerAddress }));
+  }
 
   return { approve, request };
 }
@@ -112,10 +115,11 @@ async function createApproveTx(
   amount: number
 ): Promise<{ approve_tx_request: any; request: any }> {
   const url = `${env("API_URL")}/autonomy-sdk-api/base/tx/approve`;
-  const { success, request, approve_tx_request } = await fetcher<{
+  const { success, request, approve_tx_request, error } = await fetcher<{
     success: boolean;
     request: any;
     approve_tx_request: any;
+    error?: string;
   }>(url, {
     body: JSON.stringify({
       token,
@@ -125,7 +129,9 @@ async function createApproveTx(
     }),
   });
 
-  if (!success) throw new Error("Failed to fetch tx approve");
+  if (!success) {
+    throw new Error("Failed to fetch approve tx | " + error + " | " + JSON.stringify({ token, triggerAddress, spender, amount }));
+  }
 
   return { approve_tx_request, request };
 }
@@ -155,9 +161,10 @@ async function createSendTokenTx(
 ): Promise<any> {
   const url = `${env("API_URL")}/autonomy-sdk-api/base/tx/sendToken`;
 
-  const { success, request } = await fetcher<{
+  const { success, request , error} = await fetcher<{
     success: boolean;
     request: any;
+    error?: string;
   }>(url, {
     body: JSON.stringify({
       to,
@@ -167,7 +174,7 @@ async function createSendTokenTx(
     }),
   });
 
-  if (!success) throw new Error("Failed to fetch tx sendToken");
+  if (!success) throw new Error("Failed to fetch tx sendToken | " + error + " | " + JSON.stringify({ to, token, amount, triggerAddress }));
 
   return request;
 }
@@ -193,9 +200,10 @@ export async function sendEth(
 
 async function createSendEthTx(to: string, amount: number): Promise<any> {
   const url = `${env("API_URL")}/autonomy-sdk-api/base/tx/sendEth`;
-  const { request, success } = await fetcher<{
+  const { request, success,error } = await fetcher<{
     request: any;
     success: boolean;
+    error?: string;
   }>(url, {
     body: JSON.stringify({
       to,
@@ -204,7 +212,7 @@ async function createSendEthTx(to: string, amount: number): Promise<any> {
     }),
   });
 
-  if (!success) throw new Error("Failed to fetch tx sendEth");
+  if (!success) throw new Error("Failed to fetch tx sendEth | " + error + " | " + JSON.stringify({ to, amount, triggerAddress }));
 
   return request;
 }
