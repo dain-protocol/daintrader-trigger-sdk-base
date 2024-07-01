@@ -98,7 +98,6 @@ async function getApproval(
       amount,
       triggerAddress,
       slippageBps,
-
     }),
   });
 
@@ -123,9 +122,10 @@ async function createApproveTx(
   }>(url, {
     body: JSON.stringify({
       token,
-      triggerAddress,
       spender,
       amount,
+      triggerAddress,
+
     }),
   });
 
